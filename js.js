@@ -1,56 +1,50 @@
-let firstNum;
-let secondNum;
+let firstNum = '';
+let secondNum = '';
 let op = '';
+let result;
 let buttonText;
 
 let display = document.querySelector(".display");
 const opButtons = document.querySelectorAll(".op");
 const calculatorButtons = document.querySelectorAll('.button');
+const equalButton = document.querySelector('.equal-button');
 
 //basic function for calc
-function add(a,b){
-    return a + b;
-}
-
-function subtract(a,b){
-    return a - b;
-}
-
-function multiply(a,b){
-    return a * b;
-}
-
-function devide(a,b){
-    if(b !== 0){
-        return a / b;
-    }
-    else{
-        console.log("cant devide with 0");
-    }
-}
-
-//functtion for choosing operation
-function operate(firstNum, op, secondNum){
+function operate(firstNum, op, secondNum) {
     
-    let result;
+    let num1 = parseFloat(firstNum);
+    let num2 = parseFloat(secondNum);
 
-    if(op === "+"){
-        result = add(firstNum,secondNum);
+    switch (op) {
+        case '+':
+            result = num1 + num2;
+            break;
+        case '-':
+            result = num1 - num2;
+            break;
+        case '*':
+            result = num1 * num2;
+            break;
+        case '/':
+            if (num2 !== 0) {
+                result = num1 / num2;
+            } else {
+                display.textContent = 'error';
+                return NaN;
+            }
+            break;
+        default:
+            display.textContent = 'error';
+            return NaN;
     }
-    else if(op === "-"){
-        result = subtract(firstNum,secondNum);
-    }
-    else if(op === "*"){
-        result = multiply(firstNum,secondNum);
-    }
-    else{
-        result = devide(firstNum,secondNum);
-    }
-
-    op = '';
     console.log('Result: ' + result);
-    return result;
+    display.textContent = result;
 
+        console.log('firstNum: ' + firstNum);
+        console.log('op: ' + op);
+        console.log('secondNum: ' + secondNum);
+
+    return result;
 }
 
 //fucntion for reading the buttons
@@ -58,27 +52,33 @@ function getButtonText(button) {
     return button.textContent || button.innerText;//gets the text inside the button element
 }
 
-calculatorButtons.forEach(function(button){
+calculatorButtons.forEach(function(button) {
     button.addEventListener('click', function() {
-        
-        buttonText = getButtonText(button);//stored the last pressed button
-        console.log('Button clicked: ' + buttonText);
+        buttonText = getButtonText(button);
 
-        if(op === ''){//save the num to the vars for the op
-            firstNum = buttonText;
+        if (op === '') {
+            firstNum += buttonText;
+        } else {
+            secondNum += buttonText;
         }
-        else{
-            secondNum = buttonText;
-        }
-
         display.textContent = buttonText;
     });
 });
 
-opButtons.forEach(function(button){
+opButtons.forEach(function(button) {
     button.addEventListener('click', function() {
-
         op = getButtonText(button);
         console.log('Button clicked: ' + op);
     });
 });
+
+//function for clearing and making multiple cacultations
+equalButton.addEventListener('click', function() {
+    if (firstNum !== '' && secondNum !== '') {
+        operate(firstNum, op, secondNum);
+        firstNum = result.toString(); 
+        secondNum = ''; 
+        op = ''; 
+    }
+});
+
