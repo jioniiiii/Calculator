@@ -1,13 +1,15 @@
 let firstNum = '';
 let secondNum = '';
 let op = '';
-let result;
+let result = '';
 let buttonText;
+let firstNumComplete = false;
 
 let display = document.querySelector(".display");
 const opButtons = document.querySelectorAll(".op");
 const calculatorButtons = document.querySelectorAll('.button');
 const equalButton = document.querySelector('.equal-button');
+const clearButton = document.querySelector('.clear-button');
 
 //basic function for calc
 function operate(firstNum, op, secondNum) {
@@ -25,21 +27,23 @@ function operate(firstNum, op, secondNum) {
         case '*':
             result = num1 * num2;
             break;
+        case '%':
+            result = num1 % num2;
+            break;
         case '/':
-            if (num2 !== 0) {
+            if(num2 !== 0) {
                 result = num1 / num2;
-            } else {
+            } 
+            else{
                 display.textContent = 'error';
-                return NaN;
+                return;
             }
             break;
         default:
             display.textContent = 'error';
-            return NaN;
+            return;
     }
-    console.log('Result: ' + result);
-    display.textContent = result;
-
+        console.log('Result: ' + result);
         console.log('firstNum: ' + firstNum);
         console.log('op: ' + op);
         console.log('secondNum: ' + secondNum);
@@ -56,19 +60,27 @@ calculatorButtons.forEach(function(button) {
     button.addEventListener('click', function() {
         buttonText = getButtonText(button);
 
-        if (op === '') {
-            firstNum += buttonText;
-        } else {
-            secondNum += buttonText;
+        
+        if(!firstNumComplete) {
+                firstNum += buttonText;
+                display.textContent = firstNum;
         }
-        display.textContent = buttonText;
+        else{
+            display.textContent = '';
+            secondNum += buttonText;
+            display.textContent += secondNum;
+        }
     });
 });
 
+//fucntion to get the op
 opButtons.forEach(function(button) {
     button.addEventListener('click', function() {
-        op = getButtonText(button);
-        console.log('Button clicked: ' + op);
+        
+            op = getButtonText(button);
+            firstNumComplete = true;
+            console.log('op is ' + op);
+        
     });
 });
 
@@ -76,9 +88,28 @@ opButtons.forEach(function(button) {
 equalButton.addEventListener('click', function() {
     if (firstNum !== '' && secondNum !== '') {
         operate(firstNum, op, secondNum);
+        if(display.textContent === 'error') {
+            firstNum = '';
+            secondNum = '';
+            op = '';
+            firstNumComplete = false;
+            return;
+        }
         firstNum = result.toString(); 
+        result = '';
         secondNum = ''; 
         op = ''; 
+        firstNumComplete = true;
+        display.textContent = firstNum;
     }
 });
 
+//clear button
+clearButton.addEventListener('click', function() {
+    firstNum = '';
+    secondNum = '';
+    op = '';
+    result = '';
+    firstNumComplete = false;
+    display.textContent = '';
+});
