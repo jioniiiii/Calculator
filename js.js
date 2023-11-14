@@ -10,9 +10,13 @@ const opButtons = document.querySelectorAll(".op");
 const calculatorButtons = document.querySelectorAll('.button');
 const equalButton = document.querySelector('.equal-button');
 const clearButton = document.querySelector('.clear-button');
+const percentButton = document.querySelector('.percent-button');
+const backspaceButton = document.querySelector('.bs-button');
+const decimalButton = document.querySelector('.dc-button');
+const pmButton = document.querySelector('.pm-button');
 
 //basic function for calc
-function operate(firstNum, op, secondNum) {
+function operate(firstNum, op, secondNum){
     
     let num1 = parseFloat(firstNum);
     let num2 = parseFloat(secondNum);
@@ -28,7 +32,7 @@ function operate(firstNum, op, secondNum) {
             result = num1 * num2;
             break;
         case '%':
-            result = num1 % num2;
+            result = num1 / num2;
             break;
         case '/':
             if(num2 !== 0) {
@@ -43,21 +47,24 @@ function operate(firstNum, op, secondNum) {
             display.textContent = 'error';
             return;
     }
-        console.log('Result: ' + result);
-        console.log('firstNum: ' + firstNum);
-        console.log('op: ' + op);
-        console.log('secondNum: ' + secondNum);
-
-    return result;
+    resultDC = decimalCount(result);
+        if(resultDC > 2 ){
+            result = result.toFixed(2);
+            return result;
+        }
+        else{
+            return result;
+        }
 }
 
 //fucntion for reading the buttons
-function getButtonText(button) {
+function getButtonText(button){
     return button.textContent || button.innerText;//gets the text inside the button element
 }
 
-calculatorButtons.forEach(function(button) {
-    button.addEventListener('click', function() {
+//function for reading hte numbered buttons
+calculatorButtons.forEach(function(button){
+    button.addEventListener('click', function(){
         buttonText = getButtonText(button);
 
         
@@ -74,18 +81,21 @@ calculatorButtons.forEach(function(button) {
 });
 
 //fucntion to get the op
-opButtons.forEach(function(button) {
-    button.addEventListener('click', function() {
-        
+opButtons.forEach(function(button){
+    button.addEventListener('click', function(){
+        if(firstNum !== ''){
             op = getButtonText(button);
             firstNumComplete = true;
-            console.log('op is ' + op);
+        }
+        else{
+            return;
+        }
         
     });
 });
 
 //function for clearing and making multiple cacultations
-equalButton.addEventListener('click', function() {
+equalButton.addEventListener('click', function(){
     if (firstNum !== '' && secondNum !== '') {
         operate(firstNum, op, secondNum);
         if(display.textContent === 'error') {
@@ -105,7 +115,7 @@ equalButton.addEventListener('click', function() {
 });
 
 //clear button
-clearButton.addEventListener('click', function() {
+clearButton.addEventListener('click', function(){
     firstNum = '';
     secondNum = '';
     op = '';
@@ -113,3 +123,72 @@ clearButton.addEventListener('click', function() {
     firstNumComplete = false;
     display.textContent = '';
 });
+
+//persentage 
+percentButton.addEventListener('click', function(){
+        result = operate(firstNum,'%',100);
+        firstNum = result.toString(); 
+        result = '';
+        secondNum = ''; 
+        op = ''; 
+        firstNumComplete = true;
+        display.textContent = firstNum;    
+        return result;
+});
+
+//backspace
+backspaceButton.addEventListener('click', function(){
+    if(display.textContent === firstNum && firstNum !== ''){
+        firstNum = firstNum.slice(0, -1);
+        display.textContent = firstNum;
+    }
+    else if (display.textContent === secondNum && secondNum !== ''){
+        secondNum = secondNum.slice(0, -1);
+        display.textContent = secondNum;
+    }
+});
+
+//dc button
+decimalButton.addEventListener('click', function(){
+    if(display.textContent === firstNum && firstNum !== ''){
+        firstNum += '.';
+        display.textContent = firstNum;
+    }
+    else if (display.textContent === secondNum && secondNum !== ''){
+        secondNum += '.';
+        display.textContent = secondNum;
+    }
+});
+
+//plus or minus button
+pmButton.addEventListener('click', function(){
+    if(display.textContent === firstNum && firstNum !== ''){
+        if(display.textContent[0] !== '-'){
+            firstNum = '-' + firstNum;
+            display.textContent = firstNum;
+        }
+        else{
+            firstNum = firstNum.slice(1);
+            display.textContent = firstNum;
+        }
+    }
+    else if (display.textContent === secondNum && secondNum !== ''){
+        if(display.textContent[0] !== '-'){
+            secondNum = '-' + secondNum;
+            display.textContent = secondNum;
+        }
+        else{
+            secondNum = secondNum.slice(1);
+            display.textContent = secondNum;
+        }
+    }
+});
+
+//so we can round to 0.00
+function decimalCount (number) { 
+    const numberAsString = number.toString();
+    if (numberAsString.includes('.')) {
+      return numberAsString.split('.')[1].length;
+    }
+    return 0;
+}
